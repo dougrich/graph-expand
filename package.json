@@ -1,0 +1,15 @@
+{
+  "name": "@dougrich/graph-expand",
+  "version": "0.1.0",
+  "description": "Simple algorithm to expand a node in a graph to a sub-graph",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0"
+  }
+}
