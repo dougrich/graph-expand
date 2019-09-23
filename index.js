@@ -1,22 +1,4 @@
 /**
- * Forks a graph to create a new copy
- * @param {Graph} graph original graph
- * @returns {Graph} forked copy of the graph
- */
-function forkGraph(graph) {
-  return clone(graph)
-}
-
-/**
- * Clones an object
- * @param {any} obj original
- * @returns {any} clone of the original with no links
- */
-function clone(obj) {
-  return JSON.parse(JSON.stringify(obj))
-}
-
-/**
  * Replaces a node in a graph with a subgraph
  * @param {Graph} graph original graph
  * @param {number} index node to replace
@@ -24,17 +6,18 @@ function clone(obj) {
  * @returns {Graph} the graph with the subgraph inserted at index
  */
 function replace(graph, index, subGraph) {
-  graph = forkGraph(graph)
+  graph = this.fork(graph)
   const base = graph.nodes.length
-  graph.nodes.push(...subGraph.nodes.map(clone))
-  graph.connections.push(...subGraph.connections.map(({
+  const { nodes, connections } = this.clone(subGraph)
+  graph.nodes = this.append(graph.nodes, nodes)
+  graph.connections = this.append(graph.connections, connections.map(({
     start,
     end,
     ...rest
   }) => ({
     start: start + base,
     end: end + base,
-    ...clone(rest)
+    ...rest
   })))
   graph.nodes[index] = {
     type: 'replaced',
@@ -135,7 +118,41 @@ function flatten(graph) {
   }
 }
 
-module.exports = {
-  flatten,
-  replace
+/**
+ * Clones an object
+ * @param {any} obj original
+ * @returns {any} clone of the original with no links
+ */
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj))
 }
+
+function GraphContext({ fork, append, clone }) {
+  const that = {}
+  that.fork = fork
+  that.clone = clone
+  that.append = append
+  that.flatten = flatten.bind(that)
+  that.replace = replace.bind(that)
+  return that
+}
+
+GraphContext.Immutable = {
+  fork: clone,
+  append: (arr, e) => [...arr, ...e],
+  clone: clone
+}
+
+GraphContext.Mutable = {
+  fork: a => { return a },
+  append: (arr, e) => {
+    arr.push(...e)
+    return arr
+  },
+  clone: clone
+}
+
+GraphContext.flatten = flatten.bind(GraphContext.Immutable)
+GraphContext.replace = replace.bind(GraphContext.Immutable)
+
+module.exports = GraphContext

@@ -137,3 +137,22 @@ Note that:
 ## `flatten`
 
 While the above represents all the data, following index redirects is a PITA. So calling `flatten` removes all redirects by walking the graph from start onwards.
+
+## Advanced usage: replacing `fork`, `append`, and `clone`
+
+So the default behavior for the library is to be `immutable`: it makes a copy of the object before making any changes. This is useful for reasoning about code, but is inefficient when we are doing several `replaces` on a very complex graph as we are copying data over and over. To instead pass in your own copies of `fork` and `clone`, use the following code:
+
+```js
+const { flatten, replace } = require('@dougrich/graph-expand')({
+  fork: ...,
+  clone: ...
+})
+```
+
+`fork` is called before starting a `replace` operation and is passed the graph. By default this is just a flat `JSON.parse(JSON.stringify)` which is inefficient. This could be replaced with a copy library or, in the mutable case, just a passthrough.
+
+`clone` is called on a subgraph before it is inserted. Even in `mutable` case this is still a flat copy, as the `subGraph` is expected to be coming from a library of subgraphs. This could be replaced with a library or if you are always generating new `subGraphs`, a passthrough.
+
+`append` is called with the array and the elements to add to that array and returns the result. In the immutable case, this creates a new array: in the mutable, this pushes into the existing one and returns the result. Swap around as needed for your specific case.
+
+Basically these let you tune the specific behavior.

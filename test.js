@@ -1,5 +1,7 @@
-const { replace, flatten } = require('./')
+const GraphContext = require('./')
 const { expect } = require('chai')
+
+const { replace, flatten } = GraphContext
 
 describe('replace', () => {
 
@@ -121,6 +123,42 @@ describe('replace', () => {
 
       expect(originalNode.tick).not.to.equal(true)
       expect(originalConnection.tick).not.to.equal(true)
+    })
+
+    it('does not link the graph', () => {
+      /**
+       * This is important so that we are properly immutable
+       */
+      const graph = {
+        nodes: ['start', 'end'],
+        connections: [
+          {
+            start: 0,
+            end: 1
+          }
+        ],
+        start: 0,
+        end: 1
+      }
+
+      const subgraph = {
+        nodes: [{ type: 'expanded' }, { type: 'expanded' }],
+        connections: [
+          {
+            start: 0,
+            end: 1
+          }
+        ],
+        start: 0,
+        end: 1
+      }
+      const originalNodes = graph.nodes
+      const originalLength = graph.nodes.length
+
+      const result = replace(graph, 0, subgraph)
+
+      expect(originalNodes.length).to.equal(originalLength)
+      expect(result.nodes).not.to.equal(originalNodes)
     })
   })
 })
@@ -264,5 +302,88 @@ describe('flatten', () => {
         expect(result).to.deep.equal(expectedResult)
       })
     }
+  })
+})
+
+describe('Mutable', () => {
+  const { replace } = new GraphContext(GraphContext.Mutable)
+
+
+  describe('side effects', () => {
+    it('clones the sub graph and does not link the sub graph', () => {
+      /**
+       * This is important so that the sub graph can be re-used in other graphs
+       */
+      const graph = {
+        nodes: ['start', 'end'],
+        connections: [
+          {
+            start: 0,
+            end: 1
+          }
+        ],
+        start: 0,
+        end: 1
+      }
+
+      const subgraph = {
+        nodes: [{ type: 'expanded' }, { type: 'expanded' }],
+        connections: [
+          {
+            start: 0,
+            end: 1
+          }
+        ],
+        start: 0,
+        end: 1
+      }
+      const originalNode = subgraph.nodes[0]
+      const originalConnection = subgraph.connections[0]
+
+      const result = replace(graph, 0, subgraph)
+
+      result.nodes[1].tick = true
+      result.connections[1].tick = true
+
+      expect(originalNode.tick).not.to.equal(true)
+      expect(originalConnection.tick).not.to.equal(true)
+    })
+
+    it('links the graph', () => {
+      /**
+       * This is important so that we do not constantly recreate very complex objects when doing replaces
+       * Note the inversion of expectations compared to the test above
+       */
+      const graph = {
+        nodes: ['start', 'end'],
+        connections: [
+          {
+            start: 0,
+            end: 1
+          }
+        ],
+        start: 0,
+        end: 1
+      }
+
+      const subgraph = {
+        nodes: [{ type: 'expanded' }, { type: 'expanded' }],
+        connections: [
+          {
+            start: 0,
+            end: 1
+          }
+        ],
+        start: 0,
+        end: 1
+      }
+      const originalNodes = graph.nodes
+      const originalLength = graph.nodes.length
+
+      const result = replace(graph, 0, subgraph)
+
+      expect(originalNodes.length).not.to.equal(originalLength)
+      expect(result.nodes).to.equal(originalNodes)
+    })
   })
 })
