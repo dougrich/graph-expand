@@ -1,6 +1,6 @@
 {
   "name": "@dougrich/graph-expand",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple algorithm to expand a node in a graph to a sub-graph",
   "main": "index.js",
   "scripts": {
