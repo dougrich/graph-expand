@@ -137,19 +137,25 @@ describe('flatten', () => {
               start: 1,
               end: 1
             },
+            'mid',
             'final'
           ],
-          connections: [],
+          connections: [
+            { start: 0, end: 2 }
+          ],
           start: 0,
-          end: 0
+          end: 2
         },
         {
           nodes: [
+            'mid',
             'final'
           ],
-          connections: [],
+          connections: [
+            { start: 0, end: 1 }
+          ],
           start: 0,
-          end: 0
+          end: 1
         }
       ],
       [
@@ -180,6 +186,70 @@ describe('flatten', () => {
           ],
           connections: [
             { start: 0, end: 1 },
+            { start: 1, end: 2 }
+          ],
+          start: 0,
+          end: 2
+        }
+      ],
+      [
+        'End',
+        {
+          nodes: [
+            'mid',
+            'final',
+            {
+              type: 'replaced',
+              start: 0,
+              end: 0
+            }
+          ],
+          connections: [
+            { start: 2, end: 1 }
+          ],
+          start: 2,
+          end: 1
+        },
+        {
+          nodes: [
+            'mid',
+            'final'
+          ],
+          connections: [
+            { start: 0, end: 1 }
+          ],
+          start: 0,
+          end: 1
+        }
+      ],
+      [
+        'Metadata preserved',
+        {
+          nodes: [
+            'start',
+            {
+              type: 'replaced',
+              start: 3,
+              end: 3
+            },
+            'final',
+            'mid'
+          ],
+          connections: [
+            { start: 0, end: 1, preserved: true  },
+            { start: 1, end: 2 }
+          ],
+          start: 0,
+          end: 2
+        },
+        {
+          nodes: [
+            'start',
+            'mid',
+            'final'
+          ],
+          connections: [
+            { start: 0, end: 1, preserved: true  },
             { start: 1, end: 2 }
           ],
           start: 0,
