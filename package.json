@@ -6,7 +6,13 @@
   "scripts": {
     "test": "mocha"
   },
-  "author": "",
+  "author": {
+    "name": "Douglas Richardson"
+  },
+  "repository": "git@github.com:dougrich/graph-expand.git",
+  "bugs": {
+    "url": "https://github.com/dougrich/graph-expand/issues"
+  },
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.2.0",
